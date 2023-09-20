@@ -146,6 +146,75 @@ app.get('/students/:record_id', function (req, res) {
   });
 });
 
+function readStudents(files, studentList, res, lastname) {
+  if (files.length===0) {
+    //done reading all students into array
+    // now we filter for that student
+
+    const filteredStudents = studentList.filter(student => student.last_name === lastname);
+    if (filteredStudents.length===0){
+      return res.status(404).send({"message":"No students found with the specified last name."})
+    }
+    var obj= {};
+    obj.students = filteredStudents;
+    return res.status(200).send(obj);
+  }
+
+  var fname = files.pop();
+
+  fs.readFile(fname, "utf8", function (err, data) {
+    if (err) {
+      return res.status(500).send({"message" : "error - internal server error"});
+    }
+   
+      studentList.push(JSON.parse(data));
+      
+      readStudents(files, studentList, res, lastname);
+    })
+  };
+
+/**
+ * @swagger
+ * /students/search/{lastname}:
+ *   get:
+ *     summary: Get a student by last name.
+ *     description: Use this endpoint to retrieve a student based on their last name.
+ *     parameters:
+ *       - name: lastname
+ *         description: Student's last name
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success. The student object has been retrieved.
+ *       404:
+ *         description: Error. The requested resource was not found.
+ */
+app.get('/students/search/:lastname', function (req, res) {
+  var lastname = req.params.lastname;
+
+ // From lecture on 9/14 at time stamp 1:35:00
+  var obj = {};
+  var arr = [];
+
+  glob("students/*.json", null, function (err, files) {
+    if (err) {
+      return res.status(500).send({ "message": "error - internal server error" });
+    }
+
+
+    console.log('list of students to be read', files)
+
+   readStudents(files, [], res,lastname);
+  });
+
+    // read all files and store into a student list array
+
+  //loop through the array and finds the last name when there is a match 
+});
+
 function readFiles(files, arr, res) {
   fname = files.pop();
   if (!fname)
@@ -328,6 +397,21 @@ function checkStudentExists(files, obj, fname, lname, res) {
   return false;
 
 }
+
+app.get('/students/:lastname', function (req, res) {
+  var record_id = req.params.record_id;
+
+  fs.readFile("students/" + record_id + ".json", "utf8", function (err, data) {
+    if (err) {
+      var rsp_obj = {};
+      rsp_obj.record_id = record_id;
+      rsp_obj.message = 'error - resource not found';
+      return res.status(404).send(rsp_obj);
+    } else {
+      return res.status(200).send(data);
+    }
+  });
+});
 
 app.listen(5678); //start the server
 console.log('Server is running...');
