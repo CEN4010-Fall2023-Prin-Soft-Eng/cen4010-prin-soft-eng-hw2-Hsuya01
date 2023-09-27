@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List All Students</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Bootstrap Navigation Bar (Preserve the header) -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index2.html">Student Management System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="addStudent.html">Add Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="updateStudent.html">Update Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="deleteStudent.html">Delete Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="displayStudent.html">Display Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="listStudents.html">List All Students</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="searchStudent.html">Search Students</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Content of the List All Students page goes here -->
+    <div class="container mt-4">
+        <h1>List All Students</h1>
+        
+        <!-- Student list will be displayed here using JavaScript -->
+        <div id="studentList">
+            <!-- Student list will be populated using JavaScript -->
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS (optional) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript to set the active class -->
+    <script>
+        // Get the current URL pathname
+        var pathName = window.location.pathname;
+
+        // Find and add the 'active' class to both the header and sidebar navigation links
+        $('nav a').each(function () {
+            var href = $(this).attr('href');
+            if (pathName === href) {
+                $(this).addClass('active');
+            }
+        });
+        
+        // JavaScript to fetch and display a list of all students
+        $(document).ready(function () {
+            // Make an AJAX request to fetch a list of all students
+            $.get("/students", function (data) {
+                // Create a list of students
+                var studentListHtml = '<ul>';
+                data.students.forEach(function (student) {
+                    studentListHtml += '<li>' + student.first_name + ' ' + student.last_name + '</li>';
+                });
+                studentListHtml += '</ul>';
+                
+                // Display the list of students in the 'studentList' div
+                $('#studentList').html(studentListHtml);
+            }).fail(function () {
+                // Display an error message if the request fails
+                $('#studentList').html('<div class="alert alert-danger">Error: Unable to retrieve student list</div>');
+            });
+        });
+    </script>
+    <p><a href="index.html">Back to Home</a></p>
+</body>
+</html>
