@@ -26,7 +26,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('./public'));
-
+ 
 /**
  * @swagger
  * /students:
@@ -413,7 +413,8 @@ app.get('/students/:lastname', function (req, res) {
   });
 });
 
-app.listen(5678); //start the server
+const PORT = process.env.PORT || 5678;
+app.listen(PORT); //start the server
 console.log('Server is running...');
 console.log('Webapp:   http://localhost:5678/')
 console.log('API Docs: http://localhost:5678/api-docs')
